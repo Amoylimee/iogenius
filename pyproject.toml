@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iogenius"
+version = "0.1.0"
+description = "Uselful tools for setting up input-output"
+authors = [
+    {name = "Jiajing Jeremy Chen", email = "jchenhl@connect.ust.hk"}
+]
+requires-python = ">=3.9"
+readme = "README.md"
+license = {text = "MIT"}
+
+# 由于只使用标准库(os, pathlib)，这里可以为空
+dependencies = []
