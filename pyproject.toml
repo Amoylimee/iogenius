@@ -9,7 +9,7 @@ description = "Uselful tools for setting up input-output"
 authors = [
     {name = "Jiajing Jeremy Chen", email = "jchenhl@connect.ust.hk"}
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 readme = "README.md"
 license = {text = "MIT"}
 
