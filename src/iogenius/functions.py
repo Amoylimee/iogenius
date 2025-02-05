@@ -26,7 +26,7 @@ def create_new_directory(directory_path: str) -> None:
     return
 
 
-def read_and_merge(file, format = 'feather'):
+def read_file(file, format = 'feather'):
 
     if format == 'feather':
         return pd.read_feather(file)  # 使用 feather 格式读取
@@ -38,11 +38,11 @@ def read_and_merge(file, format = 'feather'):
 
 def concat_files_in_folder(directory_in: str, format = 'feather', max_workers=24) -> pd.DataFrame:
     print(f"Concatenating files in {directory_in}...")
-    files_in = glob.glob(f"{directory_in}/*{format}")
+    files_in = glob.glob(f"{directory_in}/**/*.{format}", recursive=True)
     dataframes = []
     
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        futures = {executor.submit(read_and_merge, file, format): file for file in files_in}
+        futures = {executor.submit(read_file, file, format): file for file in files_in}
         for future in track(as_completed(futures), total=len(futures), description="Concatenating..."):
             try:
                 data = future.result()
@@ -52,5 +52,6 @@ def concat_files_in_folder(directory_in: str, format = 'feather', max_workers=24
                 print(str(e))
                 
     df = pd.concat(dataframes, axis=0)
+    df = df.reset_index(drop=True)
     gc.collect()
     return df
