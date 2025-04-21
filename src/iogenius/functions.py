@@ -3,7 +3,7 @@ import glob
 import gc
 import pandas as pd
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from rich.progress import track
+from rich.progress import Progress
 
 def set_working_directory(working_directory: str) -> None:
     """
@@ -37,20 +37,23 @@ def read_file(file, format = 'feather'):
 
 
 def concat_files_in_folder(directory_in: str, format = 'feather', max_workers=24) -> pd.DataFrame:
-    print(f"Concatenating files in {directory_in}...")
     files_in = glob.glob(f"{directory_in}/**/*.{format}", recursive=True)
     dataframes = []
     
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        futures = {executor.submit(read_file, file, format): file for file in files_in}
-        for future in track(as_completed(futures), total=len(futures), description="Concatenating..."):
-            try:
-                data = future.result()
-                dataframes.append(data)
-            except Exception as e:
-                print(f"Error reading file: file {futures[future]}: {e}")
-                print(str(e))
-                
+    with Progress() as progress:
+        task = progress.add_task(f"Concatenating files in {directory_in}...", total=len(files_in))
+        
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(read_file, file, format): file for file in files_in}
+            
+            for future in as_completed(futures):
+                try:
+                    data = future.result()
+                    dataframes.append(data)
+                except Exception as e:
+                    print(f"Error reading file {futures[future]}: {e}")
+                progress.advance(task)
+    
     df = pd.concat(dataframes, axis=0)
     df = df.reset_index(drop=True)
     gc.collect()
