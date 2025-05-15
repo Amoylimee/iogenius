@@ -14,7 +14,7 @@ def set_working_directory(working_directory: str) -> None:
     return print(f'Working directory set to {working_directory}')
 
 
-def create_new_directory(directory_path: str) -> None:
+def create_new_directory(directory_path: str | any) -> None:
     """Create a new folder/directory if the folder/directory does not exist.
 
     io_create_new_folder(/disk/r046/jchenhl/Project_RBF/)
