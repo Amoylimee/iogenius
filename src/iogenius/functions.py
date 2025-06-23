@@ -2,6 +2,7 @@ import os
 import glob
 import gc
 import pandas as pd
+import geopandas as gpd
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from rich.progress import Progress
 
@@ -26,14 +27,19 @@ def create_new_directory(directory_path) -> None:
     return
 
 
-def read_file(file, format = 'feather'):
-
+def read_file(file, format='feather'):
     if format == 'feather':
         return pd.read_feather(file)  # 使用 feather 格式读取
     elif format == 'parquet':
         return pd.read_parquet(file)
     elif format == 'csv':
         return pd.read_csv(file)
+    elif format == 'shp':
+        return gpd.read_file(file)  # 读取 shapefile
+    elif format == 'geojson':
+        return gpd.read_file(file)  # 读取 geojson
+    else:
+        raise ValueError(f"Unsupported format: {format}")
 
 
 def concat_files_in_folder(directory_in: str, format = 'feather', max_workers=24) -> pd.DataFrame:
